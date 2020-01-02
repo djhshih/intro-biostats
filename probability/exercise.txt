@@ -1,0 +1,3 @@
+Exercise:
+
+Given that the probability of a coin (not necessarily fair) landing on its head is h, what is the probability of the coin landing on its tail? (You are not considering the possibility that the coin lands on its side.) What is the maximum and minimum value of this probability? Derive and justify your answer using the 3 axioms above.

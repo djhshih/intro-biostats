@@ -1,0 +1,14 @@
+What is probability?
+
+Probability is difficult to define without the use of words that are (colloquially) synonymous with probability itself. In fact, no one has come up with a precise, non-circular definition of probability. Even a preeminent mathematician, Andrey Kolmogorov (1903-1987), could not define probability. Nonetheless, he proposed three useful criteria that probabilities must satisfy. These criteria are known as the Kolmogorov Axioms.
+
+Axiom 1
+The probability of any event is a non-negative real number. (That is, probabilities cannot be negative.)
+
+Axiom 2
+The probability of the entire sample space is one. (The sample space comprises all possible events being considered.)
+
+Axiom 3
+The probability of disjoint (mutually exclusive) events is the sum of the probabilities of the individual events. (Disjoint events are those that cannot occur together at the same time.)
+
+Although these axioms do not define what probability is, they define what is not probability. From these simple axioms, we can derive many rules that we can use to work with probabilities, such as the probability of an complementary event.

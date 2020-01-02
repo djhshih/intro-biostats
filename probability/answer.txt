@@ -1,0 +1,51 @@
+I.  The probability of the coin landing on its tail is (1 - h).
+
+Proof
+
+The events being considered are:
+
+1. The coin lands on its head.
+2. The coin lands on its tail.
+
+Since these two events cannot occur at the same time, they are disjoint.
+By Axiom 3, we know that
+
+P(head or tail) = P(head) + P(tail)
+
+Further, these two events are the only possible events being considered (i.e. the sample space S), we know that
+
+P(S) = P(head or tail) = P(head) + P(tail)
+
+From Axiom 2, we know that the probability of the sample space (S) is one. It follows that
+
+1 = P(S)
+1 = P(head or tail)
+1 = P(head) + P(tail)
+
+Given that P(head) = h, we have
+
+P(tail) = 1 - P(head) = 1 - h
+
+
+II.  The minimum value of P(tail) is 0 and the maximum value of P(tail) is 1.
+
+Proof
+
+By Axiom 1, we know that the following are true.
+
+h >= 0
+P(tail) >= 0
+
+Therefore, the minimum value of P(tail) is 0.
+
+And from Part I, we know that
+
+P(tail) = 1 - h
+
+Therefore, the maximum value of P(tail) occurs when h is at its minimum.
+In other words, P(tail) is maximum when h is 0.
+
+max P(tail) = max (1 - h) = 1 - min h = 1 - 0 = 1
+
+Therefore, the maximum value of P(tail) is 1.
+
