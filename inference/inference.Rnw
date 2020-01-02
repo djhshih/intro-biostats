@@ -1,0 +1,695 @@
+\documentclass{beamer}
+\usetheme{boxes}
+\usecolortheme{beaver}
+
+\usepackage{Sweave}
+
+\beamertemplatenavigationsymbolsempty
+\setbeamertemplate{footline}[frame number]
+
+\newcommand{\expect}{\mathrm{E}}
+\newcommand{\variance}{\mathrm{Var}}
+\newcommand{\sd}{\mathrm{SD}}
+\newcommand{\prob}{\mathrm{P}}
+
+
+\begin{document}
+
+\title{Statistical Inference}
+\subtitle{LMP1407H Tutorial}
+\author{David J. H. Shih}
+\date{February 20, 2014}
+\subject{Statistics}
+
+\frame{\titlepage}
+
+<<fair-die, fig=TRUE, include=FALSE, echo=FALSE, height=3.5, width=3.5>>=
+n <- 1000;
+x <- sample(1:6, n, replace=TRUE);
+hist(x, breaks=0:6, main=sprintf("Tosses of a fair die \n(n = %d)", n), las=1);
+@
+
+<<unfair-die, fig=TRUE, include=FALSE, echo=FALSE, height=3.5, width=3.5>>=
+x <- sample(1:6, n, replace=TRUE,
+prob=c(0.4, 0.1, 0.1, 0.1, 0.1, 0.4));
+hist(x, breaks=0:6, main=sprintf("Tosses of a loaded die \n(n = %d)", n), las=1);
+@
+
+\begin{frame}
+\frametitle{Distribution}
+
+A \textbf{probability distribution} is a mapping from possible values of a random variable to their respective probabilities.
+
+\vskip5pt
+
+We will consider the \textbf{probability} of an event as the \textbf{long-run frequency} of the event occurring in an infinitely replicated experiment.
+
+\includegraphics[width=0.5\textwidth]{inference-fair-die}%
+\includegraphics[width=0.5\textwidth]{inference-unfair-die}
+
+\end{frame}
+
+<<height-curve, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+curve(dnorm(x, mean=170, sd=10), xlim=c(140, 200), main="Height of Caucasian males", ylab="Probability density", xlab="Height", las=1);
+@
+
+\begin{frame}
+\frametitle{Probability mass function and Probability density function}
+
+\textbf{Probability mass functions} describe the probability distribution of \textbf{discrete} random variables (e.g. dice outcome, gender).
+
+\vskip5pt
+
+\textbf{Probability density functions} describe the probability distribution of \textbf{continuous} random variables (e.g. time, temperature).
+
+\begin{center}
+\includegraphics[width=0.45\textwidth]{img/height}
+\hskip10pt
+\includegraphics[width=0.45\textwidth]{inference-height-curve}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Statistical inference}
+
+We use information from a \textbf{sample} to draw conclusions about the \textbf{population} from which the sample was taken.
+
+\vskip10pt
+
+The \textbf{population} consists of all individuals of interest (including unobserved individuals).
+
+\vskip5pt
+
+The \textbf{sample} consists of a subset of (observed) individuals drawn randomly from the population.
+
+\vskip10pt
+
+It is usually not possible or practical to observe or make measurements of the population, so we work with the sample.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Mathematics}
+
+\begin{columns}
+\hskip10pt
+\begin{column}{0.30\textwidth}
+
+\begin{center}
+\includegraphics[width=\textwidth]{img/gauss}
+
+Carl Friedrich Gauss
+(1777 - 1855)
+\end{center}
+
+\end{column}
+\begin{column}{0.65\textwidth}
+
+``Mathematics is the queen of the sciences.''
+
+\vskip5pt
+
+``The enchanting charms of this sublime science reveal themselves in all their beauty only to those who have the courage to go deeply into it.''
+
+\vskip10pt
+
+\end{column}
+
+\end{columns}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Mean and variance}
+
+Given random variable $X$, its \textbf{mean} defined as $\expect[X]$.
+
+\vskip5pt
+
+If $X$ is discrete,
+\[
+\expect[X] = \sum_i x_1 \, f_i
+\]
+
+If $X$ is continuous,
+\[
+\expect[X] = \int x \, p(x) \, dx
+\]
+
+\vskip10pt
+
+The \textbf{variance} is defined as:
+
+\[
+\variance(X) = \expect[(X - \expect[X])^2]
+\]
+
+\vskip10pt
+
+The \textbf{standard deviation} is defined as:
+
+\[
+\sd(X) = \sqrt{\variance(X)}
+\]
+
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Mean and variance}
+
+The definitions of mean and variance apply for any $X$ (with an \emph{arbitrary} probability distribution), for so long as $\expect[X]$ exists.
+
+\vskip5pt
+
+Under the Gaussian distribution $N(\mu, \sigma)$ (continuous),
+
+\begin{itemize}
+\item  The mean ($\mu$) is independent of the standard deviation ($\sigma$).
+\item  The interval $\mu \pm \sigma$ spans approximately 68.3\% of the data; $\mu \pm 2\sigma$ spans 95.4\%; $\mu \pm 3\sigma$ spans 99.7\%.
+\end{itemize}
+
+Under the Poisson distribution $Pois(\lambda)$ (discrete),
+
+\begin{itemize}
+\item  The mean ($\lambda$) is equal to the variance ($\lambda$).
+\end{itemize}
+
+Under the binomial distribution $B(n, p)$ (discrete),
+
+\begin{itemize}
+\item  The mean is $np$ and the variance is $np(1-p)$.
+\end{itemize}
+
+Other common distributions include $\chi^2$, log-normal, uniform, exponential, and many more.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Sample standard deviation}
+
+Given a \emph{sample} of $n$ observations $(x_1 ... x_n)$ drawn independently from a distribution, we can calculate the \textbf{sample standard deviation} as an \emph{estimate} of the standard deviation of the population.
+
+\[
+s = \sqrt{ \frac{1}{n-1} \sum_i^n (x_1 - \bar{x})^2 }
+\]
+
+where $\bar{x}$ is the \textbf{sample mean}.
+
+\[
+\bar{x} = \frac{1}{n} \sum_i^n x_1
+\]
+
+As $n \to \infty$, $s \to \sd(X)$.
+Equivalently, $E[s] = \sd(X)$.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Standard error}
+
+\textbf{Standard error} is the standard deviation of repeated samplings of a summary \textbf{statistic}.
+
+\vskip10pt
+
+For example, standard error of the mean (\textbf{SEM}) is the standard deviation of the means of many, many samples of the population. Instead of actually sampling from the population repeatedly, we may estimate SEM by
+
+\[
+SEM = SE_{\bar{x}} = \frac{s}{\sqrt{n}}
+\]
+
+where $\bar{x}$ is the sample mean, $s$ is the sample standard deviation, $n$ is the number of observations in the sample (sample size). Note that this equation only holds if the sample is drawn from a \emph{normally distributed} population.
+
+\vskip5pt
+
+Otherwise, we may estimate the standard error (of the mean or some other summary statistic) by \textbf{bootstrapping}.
+
+\end{frame}
+
+
+<<norm-pop, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+curve(dnorm(x), xlim=c(-3, 3), main="Population\nmean = 0,  sd = 1", ylab="Frequency", las=1);
+@
+
+<<norm-sample1, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+n = 100;
+x1 = rnorm(n);
+x1m = mean(x1);
+x1d = sd(x1);
+x1se = x1d / sqrt(n);
+hist(x1, xlim=c(-3, 3), breaks=10, main=sprintf("Sample_1\nmean = %s,  sd = %s", format(x1m, digits=2), format(x1d, digits=2)), ylab="frequency", las=1);
+@
+
+<<norm-sample2, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+x2 = rnorm(n);
+x2m = mean(x2);
+x2d = sd(x2);
+hist(x2, xlim=c(-3, 3), breaks=10, main=sprintf("Sample_2\nmean = %s , sd = %s", format(x2m, digits=2), format(x2d, digits=2)), ylab="frequency", las=1);
+@
+
+<<norm-sample3, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+x3 = rnorm(n);
+x3m = mean(x3);
+x3d = sd(x3);
+hist(x3, xlim=c(-3, 3), breaks=10, main=sprintf("Sample_3\nmean = %s,  sd = %s", format(x3m, digits=2), format(x3d, digits=2)), ylab="frequency", las=1);
+@
+
+<<norm-samplem, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+x4 = rnorm(n);
+x4m = mean(x4);
+x4d = sd(x4);
+hist(x4, xlim=c(-3, 3), breaks=10, main=sprintf("Sample_m\nmean = %s,  sd = %s", format(x4m, digits=2), format(x4d, digits=2)), ylab="frequency", las=1);
+@
+
+
+
+
+\begin{frame}
+\frametitle{Standard error}
+
+From a population with $\mu = 0$ and $\sigma = 1$, we draw $m$ samples of $n = \Sexpr{n}$ data points each, where $m$ is a really, really large number.
+
+\begin{center}
+\includegraphics[width=0.30\textwidth]{inference-norm-pop}
+\vskip5pt
+\includegraphics[width=0.21\textwidth]{inference-norm-sample1}
+\hskip5pt
+\includegraphics[width=0.21\textwidth]{inference-norm-sample2}
+\hskip5pt
+\includegraphics[width=0.21\textwidth]{inference-norm-sample3}
+\hskip5pt...\hskip5pt
+\includegraphics[width=0.21\textwidth]{inference-norm-samplem}
+\end{center}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Standard error}
+
+Instead of calculating SEM directly through repeated sampling,
+
+\[
+SEM = \sd( (\Sexpr{format(x1m, digits=2)}, \Sexpr{format(x2m, digits=2)}, \Sexpr{format(x3m, digits=2)}, ... \Sexpr{format(x4m, digits=2)}) )
+\]
+
+we can estimate SEM using standard deviation of the data from one sample by
+
+\[
+SEM = \frac{s}{\sqrt{n}} = \frac{\Sexpr{format(x1d, digits=2)}}{\Sexpr{n}} = \Sexpr{format(x1se, digits=2)}
+\]
+
+\vskip10pt
+
+If the population is \emph{not} normally distributed, we may instead calculate SEM through repeated re-sampling with replacement of the sample itself (known as \textbf{bootstrapping}).
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Distribution of the sample mean}
+
+By the central limit theorem, we know that the distribution of the sampel mean, $\bar{x} = \frac{1}{n} \sum_i x_i$, converges to a normal distribution, irrespective of the distribution from which $x_i$ were drawn, provided that $n$ is sufficiently large.
+
+\vskip5pt
+
+Since $\bar{x}$ is an (unbiased) estimate of the population mean $\mu$, the distribution of $\bar{x}$ will be centered around $\mu$. Further, SEM ($s / \sqrt{n}$) is the standard deviation of $\bar{x}$.
+
+\vskip5pt
+
+Therefore, $\bar{x}$ is distributed as follows (if $n$ is sufficiently large).
+
+\[
+\bar{x} \quad \sim \quad N(\mu, s/\sqrt{n})
+\]
+
+where $\mu$ is the population mean, $s$ the sample standard deviation, and $n$ the sample size.
+
+\end{frame}
+
+<<lnorm-pop, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+lmu <- 2;
+lsigma <- 0.5;
+mu <- exp(lmu + 1/2 * lsigma^2);
+sigma <- sqrt( exp(2*lmu + lsigma^2) * (exp(lsigma^2) - 1));
+
+curve(dlnorm(x, meanlog = lmu, sdlog = lsigma), xlim=c(0, 30), main=sprintf("Population\nmean = %s,  sd = %s", format(mu, digits=2), format(sigma, digits=2)), ylab="Frequency", las=1);
+@
+
+<<lnorm-sample, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+n <- 500;
+x <- rlnorm(x, meanlog = lmu, sdlog = lsigma);
+xm = mean(x);
+xd = sd(x);
+hist(x, xlim=c(0, 30), breaks=20, main=sprintf("Sample (n = %d)\nmean = %s,  sd = %s", n, format(xm, digits=2), format(xd, digits=2)), ylab="frequency", las=1);
+@
+
+<<lnorm-xbar, fig=TRUE, include=FALSE, echo=FALSE, width=3.5, height=3.5>>=
+m <- 1000;
+x_bar <- unlist(lapply(1:m, function(i) mean(rlnorm(n, meanlog=lmu, sdlog=lsigma))));
+hist(x_bar, breaks=20, main=sprintf("Sample mean (m = %d)\nmean = %s,  sd = %s", m, format(mean(x_bar), digits=2), format(sd(x_bar), digits=2)), freq=FALSE, ylim=c(0, 2.5));
+curve(dnorm(x, mu, sigma/sqrt(n)), add=TRUE, col="red");
+@
+
+\begin{frame}
+\frametitle{Distributions of a population, sample, and sample mean}
+
+\includegraphics[width=0.32\textwidth]{inference-lnorm-pop}
+\includegraphics[width=0.32\textwidth]{inference-lnorm-sample}
+\includegraphics[width=0.32\textwidth]{inference-lnorm-xbar}
+
+A sample of $n = \Sexpr{n}$ observations was drawn from a population distributed as $LogNormal(\mu_{log}, \sigma_{log})$. The empirical distribution of the sample mean (re-sampled $m = \Sexpr{m}$ times) is depicted as a histogram. The theoretical distribution of the sample mean, $N(\mu, \sigma/\sqrt{n})$, is shown as a red line.
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{\textbf{Problem 1}: Identifying hyponatremia from blood test}
+
+We measure serum sodium level from a patient's blood and wish to determine whether the patient has lower than normal sodium level.
+
+\vskip10pt
+
+How do we establish the \textbf{reference range} for serum sodium level?
+
+\vskip5pt
+
+More precisely, we wish to establish the \textbf{prediction interval} based on a healthy `population', and a \emph{new} healthy patient's sodium level should fall within this interval at a defined significance level.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Establishing the prediction interval}
+
+\begin{itemize}
+
+\item Assume the distribution of serum level is normal... \\
+\emph{\small because the mathematics is too complicated otherwise.}
+\item Collect a sample of patients from the healthy population... \\
+\emph{\small because we do not have the budget to measure the entire collection of healthy individuals.}
+\item Establish the prediction interval based on the standard deviation and mean of this sample. \\
+\emph{\small We need to be mindful that we are working with a sample, \textbf{not} the population.}
+
+\end{itemize}
+
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Establishing the prediction interval}
+
+We have collected measurements for a sample of $n$ patients, $x_1 ... x_n$, which are drawn from \emph{independent and identical distributions} (iid), $D$.
+
+\vskip5pt
+
+We assume $D = N(\mu, \sigma)$. (That is, $D$ is a normal distribution with mean $\mu$ and standard deviation $\sigma$.)
+
+\vskip10pt
+
+We wish to see whether new patient's measurement, $x_{n+1}$, falls within the prediction interval established by the sample.
+
+{(\small $x_{n+1}$ is independently drawn from distribution $D$.)}
+
+\vskip10pt
+
+Data points drawn independently drawn from distribution $D$ will fall within the $1 - \alpha$ \textbf{prediction interval} with a long-run frequency (probability) of $1 - \alpha$ over infinitely repeated experiments.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Known mean and known variance}
+
+If we \emph{were to know} the mean $\mu$ and standard deviation $\sigma$ of the measurements of the healthy population, we \emph{could} calculate the prediction interval as
+
+\[
+(\mu - z_{\alpha} \, \sigma, \; \mu + z_{\alpha} \, \sigma)
+\]
+
+where $z_{\alpha}$ is the $(1 - \alpha/2)$ percentile of the standard normal (Gaussian) distribution ($z_{0.05} \approx 1.96$).
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Infer prediction interval using a sample}
+
+In reality, we only have sample measurements, $x_1 ... x_n$, and we do not actually know the population parameters, $\mu$ and $\sigma$.
+
+\vskip5pt
+
+We may estimate $\mu$ by the sample mean $\bar{x}$ and estimate $\sigma$ by the sample standard deviation $s$, but there is error associated with each of these estimates.
+
+\vskip15pt
+
+If $n$ is \emph{sufficiently large}, the error in the estimates become negligible, and it would be permissible to substitute $\bar{x}$ for $\mu$ and $s$ for $\sigma$ in the prediction interval based on the Gaussian distribution as shown.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Unknown mean and known standard deviation}
+
+\vskip5pt
+
+Suppose we know what value the population standard deviation ($\sigma$) is, we can derive a distribution parameterized by $\sigma$.
+
+\vskip10pt
+
+The future observation $x_{n+1}$ has the distribution $N(\mu, \sigma)$.
+
+\vskip5pt
+
+The sample mean $\bar{x}$ has the distribution $N(\mu, \sigma/\sqrt{n})$.
+
+\vskip5pt
+
+In order to cancel out $\mu$ (which is unknown), we take the difference:
+\begin{align*}
+x_{n+1} - \bar{x} \quad &\sim \quad N(0, \sqrt{\sigma^2 + \sigma^2/n})\\
+ &\sim \quad N(0, \sigma^2 \sqrt{1 + 1/n})
+\end{align*}
+
+Here, the variance of the data ($\sigma^2$) is combined with the variance associated with estimating the sample mean ($\sigma^2/n$).
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Known mean and unknown standard deviation}
+
+Now suppose the population mean is known (and the population variance is unknown).
+
+\vskip5pt
+
+Based on the properties of the t-distribution,
+
+\[
+\frac{x_{n+1} - \mu}{s} \quad \sim \quad T(n-1)
+\]
+
+where $T(n-1)$ is a t-distribution with $n-1$ degrees of freedom.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Unknown mean and unknown standard deviation}
+
+Returning to the original scenario where neither $\mu$ nor $\sigma$ is known, we observe that
+
+\begin{itemize}
+\item  Standard deviation is increased by a multiplication factor of $\sqrt{1 + 1/n}$, due to the error in the sample mean
+\item  The t-distribution should be instead of the Gaussian distribution, due to the error in the sample variance
+\end{itemize}
+
+Therefore, our final \textbf{prediction interval} for $x_1 ... x_n$ is
+
+\[
+(\bar{x} - t_{\alpha,\,n-1} \, s \, \sqrt{1 + (1/n)}, \; \bar{x} + t_{\alpha,\,n-1} \, s \, \sqrt{1 + (1/n)})
+\]
+
+where $t_{\alpha,\,n-1}$ is the $(1 - \alpha/2)$ percentile of a t-distribution with $n-1$ degrees of freedom.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-parametric prediction interval}
+
+The prediction interval based on the Gaussian distribution and the t-distribution both assumes the population to be \emph{normally distributed} parameterized by some $\mu$ and $\sigma$.
+
+\vskip10pt
+
+Suppose we are unwilling to tolerate the assumption of normal distribution. We may instead choose to use a non-parametric approach, without assuming that the data comes from a particular distribution.
+
+\vskip5pt
+
+Given $x_1 ... x_n$ and $x_{n+1}$ drawn independently from an \emph{arbitrary} distribution. Due to iid, each of $x_1 ... x_{n+1}$ has the same probability of being the maximum, which is $1/(n+1)$. The probability of being the minimum is similarly $1/(n+1)$.
+
+\vskip5pt
+
+Therefore, the probability of $x_{n+1}$ being neither the maximum nor the minimum is thus $1 - 2/(n+1) = (n-1)/(n+1)$.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Non-parametric prediction interval}
+
+That is, the probability of $x_{n+1}$ falling within the range of the sample $x_1 ... x_n$ is
+
+\[
+\prob \left( x_{n+1} \in \left( x_{lower}, x_{upper} \right) \right) = \frac{n-1}{n+1}
+\]
+
+where the endpoints of the prediction interval are
+
+\[
+x_{lower} = \max_{1 \le i \le n} x_i \qquad x_{upper} = \min_{1 \le i \le n} x_i
+\]
+
+\vskip5pt
+
+With $n$ samples, we can determine an $1 - \alpha = (n-1)/(n+1)$ prediction interval. The minimum significance level $\alpha$ (and widest prediction interval) is upperbounded by the sample size $n$. For instance, $n = 199$ yields a 99\% prediction interval.
+
+\vskip5pt
+
+For narrower prediction intervals, we can perform \textbf{bootstrapping} on the sample to identify alternative endpoints.
+\end{frame}
+
+\begin{frame}
+\frametitle{\textbf{Problem 2}: Comparing fasting blood glucose levels}
+
+We measure fasting blood glucose level from two independent groups of patients: females and males, and we wish to determine whether the blood glucose level is lower in females compared to males.
+
+\vskip10pt
+
+When we claim that females have a lower glucose level than males, we do not mean that \emph{every} female has a lower glucose level than \emph{every} male.
+
+\vskip5pt
+
+Instead, we typically mean to say that females have a lower \emph{average} glucose level than that of males. (Here, average may be mean, median, or mode.)
+
+\vskip5pt
+
+In parametric hypothesis testing, we typically draw inferences about the \textbf{population means}, and we test whether one mean is statistically significantly lower, greater, or different than the other.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing a sample mean to a theoretical mean}
+
+Before tackling the most general problem of comparison of the means of two independent groups, we will first consider simpler problems. Here, we will compare a sample mean to a theoretical mean.
+
+\vskip10pt
+
+For example, we obtained $n$ iid observations of blood glucose level changes 1 hour after administering insulin. The measurements have already been converted to ratios (after/before). We will compare the sample mean of these ratios, $x_i$, to the theoretical mean ($\mu_0$), which is 1 in this example under the null hypothesis.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing a sample mean to a theoretical mean}
+
+By the central limit theorem, we know that the sample mean $\bar{x}$ will be normally distributed ($N(\mu, \sigma)$) as long as the sample size $n$ is sufficiently large.
+
+\vskip5pt
+
+If sample observations $x_i$ are already normally distributed, then $\bar{x}$ is normally distributed, regardless of $n$.
+
+\vskip10pt
+
+Since $\bar{x} \sim N(\mu, \sigma / \sqrt{n})$ and $\mu = \mu_0$ under the null hypothesis, we can standardize $\bar{x}$ as follows so that it is distributed according to the standard normal distribution $N(0, 1)$.
+
+\[
+\frac{\bar{x} - \mu_0}{\sigma / \sqrt{n}} \quad \sim \quad N(0, 1)
+\]
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing a sample mean to a theoretical mean}
+
+But the population standard deviation $\sigma$ is estimated by the sample standard deviation $s$, so we should instead use the t-distribution
+
+\[
+\frac{\bar{x} - \mu_0}{s / \sqrt{n}} \quad \sim \quad T(n - 1)
+\]
+
+Therefore, we can calculate $t$ test statistic based on the expression on the left-hand-side, and compare it against the t-distribution with $n - 1$ degrees of freedom to obtain the p-value.
+
+\vskip10pt
+
+Note that $\mu_0$ can be any theoretical value depending on how the observations were pre-processed and on the null hypothesis.
+
+\vskip10pt
+
+This test is known as the \textbf{one-sample t-test}.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing two pair-matched groups}
+
+Consider the same scenario where we measure the blood glucose level before and after administering insulin for $n$ independent patients. The two measurements for each patient (before and after) are pair-matched.
+
+\vskip5pt
+
+Unlike the previous example, we now have the raw measurements (instead of the ratios), $y_1 ... y_n$ and $z_1 ... z_n$.
+
+\vskip10pt
+
+We then calculate the differences between each pair-matched observations $(y_i, z_i)$ by
+
+\[
+x_i = y_i - z_i
+\]
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing two pair-matched groups}
+
+After calculating the sample mean $\bar{x}$ and standard deviation $s$ from the differences $x_i$, we use the t-distribution again.
+
+\[
+\frac{\bar{x} - \mu_0}{s / \sqrt{n}} \quad \sim \quad T(n - 1)
+\]
+
+Here the theoretical mean $\mu_0 = 0$. Notice this is just a special application of the one-sample t test.
+
+\vskip5pt
+
+As before, this test is valid when $\bar{x}$ is normally distributed, which is will be true if $n$ is large, or $x_i$ (or $y_i$ and $z_i$) are normally distributed.
+
+\vskip10pt
+
+This test is known as the \textbf{paired t-test}.
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing two independent groups}
+
+In the general cases where we wish to compare the means of two independent groups, we may assume that the variances of the two populations from which samples were drawn are equal or not.
+
+\vskip10pt
+
+While there is some advantage to assuming equal variance, we will present the variant of the \textbf{independent t-test} that does not assume equal variance (also known as \textbf{Welch's t-test}).
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Comparing two independent groups}
+
+Given $x_i$ and $y_i$ sampled from two respective populations, it can be shown that
+
+\[
+\frac{\bar{x} - \bar{y}}{\sqrt{s_x^2/n_x + s_y^2/n_y}} \quad \sim \quad T(\nu)
+\]
+
+where $\bar{x}$ is the sample mean of $x_i$, $s_x$ the sample standard deviation of $x_i$, $n_x$ the sample size of $x_i$, and similarly for $y_i$.
+
+\vskip5pt
+
+The degree of freedom $\nu$ can only be approximated, partly because the denominator is kept so deceivingly simple.
+
+\[
+\nu \approx \frac{ (s_x^2/n_x + s_y^2/n_y)^2 }{ (s_x^2/n_x)^2/(n_x - 1) + (s_y^2/n_y)^2 /(n_y - 1) }
+\]
+
+\end{frame}
+
+\end{document}
